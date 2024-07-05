@@ -12,20 +12,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  cypress-run:
     runs-on: ubuntu-latest
+    # run 10 copies of the current job in parallel
+
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
+      - name: Run split Cypress testes
+        uses: cypress-io/github-actions@v6
+        #pass the machine index and the total number
+        env:
+          SPLIT: ${{ strategy.job-total }}
+          SPLIT_INDEX: ${{ strategy.job-index }}
