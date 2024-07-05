@@ -5,6 +5,7 @@ name: Teste API
 on:
   schedule:
     - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 jobs:
   build:
