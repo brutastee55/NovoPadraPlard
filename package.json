@@ -18,5 +18,8 @@
     "cypress": "^13.10.0",
     "cypress-cucumber-preprocessor": "^4.3.1",
     "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "cypress-split": "^1.24.0"
   }
 }
