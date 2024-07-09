@@ -50,10 +50,12 @@ jobs:
       run: mkdir -p reports
 
     - name: Download all reports
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        for i in {1..2}; do
+        for i in {1..10}; do
           echo "Downloading mochawesome-report-${i}..."
-          actions/download-artifact@v4 --name mochawesome-report-${i} --path reports
+          gh run download 9860301748 --name mochawesome-report-${i} --dir reports || exit 1
         done
 
     - name: Install mochawesome-merge and marge
