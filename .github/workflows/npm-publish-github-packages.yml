@@ -14,44 +14,42 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
-    # run 10 copies of the current job in parallel
-
     strategy:
       fail-fast: false
       matrix:
-        containers: [1/2, 2/2,]
+        containers: [1/2, 2/2]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Run split Cypress testes
+      
+      - name: Run split Cypress tests
         uses: cypress-io/github-action@v6
         continue-on-error: true
-        #pass the machine index and the total number
         env:
           SPLIT: ${{ strategy.job-total }}
           SPLIT_INDEX: ${{ strategy.job-index }}
         with:
-           command: npm install
-           
+          command: npm install
+
       - name: Upload Cypress report
         uses: actions/upload-artifact@v4
         with:
-           name: mochawesome-report-${{ matrix.containers }}
-           path: cypress/reports
- 
+          name: mochawesome-report-${{ matrix.containers }}
+          path: cypress/reports
+
   merge-reports:
     needs: cypress-run
     runs-on: ubuntu-latest
     steps:
-      - name: Checkou repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Download all reports
-        uses: actions/download-artifact@v4
-        with:
-          name: mochawesome-report-*
-          path: reports
+        run: |
+          for i in {1..10}; do
+            gh run download ${{ github.run_id }} --name mochawesome-report-${i} --dir reports || exit 1
+          done
 
       - name: Install mochawesome-merge and mochawesome-report-generator
         run: |
@@ -69,4 +67,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: merged-mochawesome-report
-          path: merged-report    
+          path: merged-report
