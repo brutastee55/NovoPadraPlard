@@ -31,3 +31,42 @@ jobs:
         env:
           SPLIT: ${{ strategy.job-total }}
           SPLIT_INDEX: ${{ strategy.job-index }}
+        with:
+           command: npm install
+           
+      - name: Upload Cypress report
+        uses: actions/upload-artifact@v4
+        with:
+           name: mochawesome-report-${{ matrix.containers }}
+           path: cypress/reports
+ 
+  merge-reports:
+    needs: cypress-run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkou repository
+        uses: actions/checkout@v4
+      
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          name: mochawesome-report-*
+          path: reports
+
+      - name: Install mochawesome-merge and mochawesome-report-generator
+        run: |
+          npm install -g mochawesome-merge mochawesome-report-generator
+
+      - name: Merge reports
+        run: |
+          mochawesome-merge reports/**/*.json > merged-report.json
+
+      - name: Generate HTML report
+        run: |
+          marge merged-report.json --reportDir ./merged-report
+
+      - name: Upload Merged Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: merged-mochawesome-report
+          path: merged-report    
