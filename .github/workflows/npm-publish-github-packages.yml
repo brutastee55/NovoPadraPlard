@@ -43,30 +43,33 @@ jobs:
     needs: cypress-run
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Download all reports
-        run: |
-          mkdir -p reports
-          for i in {1..10}; do
-            actions/download-artifact@v4 --name mochawesome-report-${i} --path reports
-          done
+    - name: Create reports directory
+      run: mkdir -p reports
 
-      - name: Install mochawesome-merge and mochawesome-report-generator
-        run: |
-          npm install -g mochawesome-merge mochawesome-report-generator
+    - name: Download all reports
+      run: |
+        for i in {1..10}; do
+          echo "Downloading mochawesome-report-${i}..."
+          actions/download-artifact@v4 --name mochawesome-report-${i} --path reports
+        done
 
-      - name: Merge reports
-        run: |
-          mochawesome-merge reports/**/*.json > merged-report.json
+    - name: Install mochawesome-merge and marge
+      run: |
+        npm install -g mochawesome-merge mochawesome-report-generator
 
-      - name: Generate HTML report
-        run: |
-          marge merged-report.json --reportDir ./merged-report
+    - name: Merge reports
+      run: |
+        mochawesome-merge reports/**/*.json > merged-report.json
 
-      - name: Upload Merged Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: merged-mochawesome-report
-          path: merged-report
+    - name: Generate HTML report
+      run: |
+        marge merged-report.json --reportDir ./merged-report
+
+    - name: Upload Merged Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: merged-mochawesome-report
+        path: merged-report
