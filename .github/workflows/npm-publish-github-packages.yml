@@ -51,11 +51,11 @@ jobs:
 
     - name: Download all reports
       run: |
-        for i in {1..10}; do
+        for i in {1..2}; do
           echo "Downloading mochawesome-report-${i}..."
-          wget -q --show-progress https://github.com/brutastee55/NovoPadraPlard/actions/runs/9860301748/artifacts/mochawesome-report-${i}.zip -O reports/mochawesome-report-${i}.zip || exit 1
-          unzip -q reports/mochawesome-report-${i}.zip -d reports/mochawesome-report-${i} || exit 1
-          rm reports/mochawesome-report-${i}.zip || exit 1
+          curl -sSfLJO https://github.com/brutastee55/NovoPadraPlard/actions/runs/9860301748/artifacts/mochawesome-report-${i}.zip || exit 1
+          unzip -q mochawesome-report-${i}.zip -d reports/mochawesome-report-${i} || exit 1
+          rm mochawesome-report-${i}.zip || exit 1
         done
 
     - name: Install mochawesome-merge and marge
@@ -75,3 +75,4 @@ jobs:
       with:
         name: merged-mochawesome-report
         path: merged-report
+
