@@ -9,12 +9,16 @@ module.exports = defineConfig({
     specPattern: "cypress/features/execution/*.feature",
     supportFile: "cypress/support/e2e.js",
     experimentalInteractiveRunEvents: true,
-    reporter: 'mochawesome',
+    // reporter: 'mochawesome',
+    // reporterOptions: {
+    //   reportDir: 'cypress/reports',
+    //   overwrite: false,
+    //   html: false,
+    //   json: true,
+    // },
+    reporter: 'cypress-multi-reporters',
     reporterOptions: {
-      reportDir: 'cypress/reports',
-      overwrite: false,
-      html: false,
-      json: true,
+      configFile: 'reporter-config.json'
     },
     setupNodeEvents(on, config) {
 

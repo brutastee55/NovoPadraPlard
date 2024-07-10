@@ -12,10 +12,11 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
-        containers: [1, 2]
+        containers: [1/2, 2/2]
 
     steps:
       - name: Checkout repository
@@ -31,48 +32,35 @@ jobs:
           SPLIT: ${{ strategy.job-total }}
           SPLIT_INDEX: ${{ strategy.job-index }}
         with:
-          command: npm install
+          start: run --record --key your-key-here --parallel --group ${{ matrix.containers }}
 
-      - name: Upload Cypress report
-        uses: actions/upload-artifact@v4
+      - name: Save Mochawesome reports
+        uses: actions/upload-artifact@v2
         with:
-          name: mochawesome-report-${{ matrix.containers }}
+          name: mochawesome-reports
           path: cypress/reports
 
   merge-reports:
     needs: cypress-run
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Create reports directory
-      run: mkdir -p reports
+      - name: Download Mochawesome reports
+        uses: actions/download-artifact@v2
+        with:
+          name: mochawesome-reports
+          path: cypress/reports
 
-    - name: Download all reports
-      run: |
-        for i in {1..2}; do
-          echo "Downloading mochawesome-report-${i}..."
-          curl -sSfLJO https://github.com/brutastee55/NovoPadraPlard/actions/runs/9860301748/artifacts/mochawesome-report-${i}.zip || exit 1
-          unzip -q mochawesome-report-${i}.zip -d reports/mochawesome-report-${i} || exit 1
-          rm mochawesome-report-${i}.zip || exit 1
-        done
+      - name: Merge Mochawesome reports
+        run: npx mochawesome-merge cypress/reports/*.json > cypress/reports/report.json
 
-    - name: Install mochawesome-merge and marge
-      run: |
-        npm install -g mochawesome-merge mochawesome-report-generator
+      - name: Generate HTML report
+        run: npx marge cypress/reports/report.json -f report -o cypress/reports
 
-    - name: Merge reports
-      run: |
-        mochawesome-merge reports/**/*.json > merged-report.json
-
-    - name: Generate HTML report
-      run: |
-        npx marge merged-report.json --reportDir ./merged-report
-
-    - name: Upload Merged Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: merged-mochawesome-report
-        path: merged-report
-
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v2
+        with:
+          name: html-report
+          path: cypress/reports/report.html
