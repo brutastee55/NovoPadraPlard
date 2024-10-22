@@ -1,0 +1,52 @@
+[
+  {
+    "keyword": "Feature",
+    "name": "Consultar personsagens",
+    "line": 1,
+    "id": "consultar-personsagens",
+    "tags": [],
+    "uri": "RickMory_consulta.feature",
+    "elements": [
+      {
+        "id": "consultar-personsagens;consulta-personagem-especifico",
+        "keyword": "Scenario",
+        "line": 4,
+        "name": "Consulta personagem especifico",
+        "tags": [],
+        "type": "scenario",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 5,
+            "name": "que possuo um personagem para consultar $1",
+            "result": {
+              "status": "passed",
+              "duration": 71000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 6,
+            "name": "faço a consultar",
+            "result": {
+              "status": "passed",
+              "duration": 2382000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 7,
+            "name": "que os dados do personagem seja retornado",
+            "result": {
+              "status": "passed",
+              "duration": 13000000
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

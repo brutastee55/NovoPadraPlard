@@ -28,5 +28,10 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test
-        continue-on-error: true    
+        run: |
+          npm test
+          echo "::group::Resumo dos Testes"
+          echo "::warning::Resultados dos Testes:"
+          npx cypress run --reporter json | jq -r '.stats | "Total: \(.tests), Passou: \(.passes), Falhou: \(.failures), Pendente: \(.pending)"' || echo "Erro ao executar os testes"
+          echo "::endgroup::"
+        continue-on-error: true
