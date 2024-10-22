@@ -30,9 +30,9 @@ jobs:
       - name: Run tests
         run: |
           npm test
-          echo "::group::Resumo dos Testes"
+          echo "# Resumo dos Testes" >> $GITHUB_STEP_SUMMARY
           TEST_RESULTS=$(npx cypress run --reporter json | jq -r '.stats | "Total: \(.tests), Passou: \(.passes), Falhou: \(.failures), Pendente: \(.pending)"')
-          echo "::warning::Resultados dos Testes: $TEST_RESULTS"
+          echo "$TEST_RESULTS" >> $GITHUB_STEP_SUMMARY
           
           # Extrair números individuais
           TOTAL=$(echo $TEST_RESULTS | awk '{print $2}' | tr -d ',')
@@ -40,21 +40,19 @@ jobs:
           FAILED=$(echo $TEST_RESULTS | awk '{print $6}' | tr -d ',')
           PENDING=$(echo $TEST_RESULTS | awk '{print $8}')
           
-          # Criar annotations individuais
-          echo "::notice title=Total de Testes::$TOTAL"
-          echo "::notice title=Testes Passados::$PASSED"
+          # Adicionar detalhes ao resumo
+          echo "## Detalhes" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total de Testes:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          echo "- **Testes Passados:** $PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "- **Testes Falhados:** $FAILED" >> $GITHUB_STEP_SUMMARY
+          echo "- **Testes Pendentes:** $PENDING" >> $GITHUB_STEP_SUMMARY
           
-          if [ "$FAILED" -gt 0 ]; then
-            echo "::error title=Testes Falhados::$FAILED"
-          else
-            echo "::notice title=Testes Falhados::$FAILED"
-          fi
-          
-          if [ "$PENDING" -gt 0 ]; then
-            echo "::warning title=Testes Pendentes::$PENDING"
-          else
-            echo "::notice title=Testes Pendentes::$PENDING"
-          fi
-          
-          echo "::endgroup::"
+          # Adicionar gráfico de pizza
+          echo "## Gráfico de Resultados" >> $GITHUB_STEP_SUMMARY
+          echo "```mermaid" >> $GITHUB_STEP_SUMMARY
+          echo "pie title Distribuição dos Testes" >> $GITHUB_STEP_SUMMARY
+          echo "    \"Passados\" : $PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "    \"Falhados\" : $FAILED" >> $GITHUB_STEP_SUMMARY
+          echo "    \"Pendentes\" : $PENDING" >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
         continue-on-error: true
